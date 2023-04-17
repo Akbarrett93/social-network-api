@@ -9,7 +9,7 @@ module.exports = {
   },
   // Get one
   getOne(req, res) {
-    User.findOne({ _id: req.params.userId })
+    User.findById({ _id: req.params.userId })
       .then((user) => {
         if (!user) {
           res.status(404).json({ message: "No user with that ID" });
@@ -38,6 +38,7 @@ module.exports = {
       })
       .catch((err) => res.status(500).json(err));
   },
+  // Delete user
   deleteUser(req, res) {
     User.findByIdAndDelete({ _id: req.params.userId })
       .then((user) => {
