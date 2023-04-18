@@ -1,6 +1,5 @@
 const express = require("express");
 const db = require("./config/connection");
-const { Network } = require("./models");
 const routes = require("./routes");
 
 const PORT = 3001;
@@ -9,16 +8,6 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(routes);
-
-app.get("/all", (req, res) => {
-  Network.find({}, (err, result) => {
-    if (err) {
-      res.status(500).send({ message: "Internal Server Error" });
-    } else {
-      res.status(200).json(result);
-    }
-  });
-});
 
 db.once("open", () => {
   app.listen(PORT, () => {
