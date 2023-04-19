@@ -9,7 +9,7 @@ module.exports = {
   },
   // Get one
   getOne(req, res) {
-    Thought.findById({ _id: req.params.userId })
+    Thought.findById({ _id: req.params.thoughtId })
       .then((thought) => {
         if (!thought) {
           res.status(404).json({ message: "No thought with that ID!" });
@@ -23,15 +23,15 @@ module.exports = {
   createThought(req, res) {
     Thought.create(req.body)
       .then((thought) => {
-        return User.findOneandUpdate(
+        return User.findOneAndUpdate(
           { _id: req.body.userId },
-          { $addToSet: { thoughts: thought._id } },
+          { $addToSet: { thought: thought._id } },
           { new: true }
         );
       })
       .then((thought) => {
         if (!thought) {
-          res.status(404).json({ message: "No thought with that ID" });
+          res.status(404).json({ message: "No User with that ID" });
         } else {
           res.json("Thought created!");
         }
@@ -40,7 +40,11 @@ module.exports = {
   },
   // Update a thought
   updateThought(req, res) {
-    Thought.findByIdAndUpdate({ _id: req.params.thoughtId })
+    Thought.findByIdAndUpdate(
+      { _id: req.params.thoughtId },
+      { $set: req.body },
+      { new: true }
+    )
       .then((thought) => {
         if (!thought) {
           res.status(404).json({ message: "No thought with that ID" });
@@ -66,9 +70,9 @@ module.exports = {
   },
   // Create a thought reaction
   createReaction(req, res) {
-    Thought.findOneandUpdate(
+    Thought.findByIdAndUpdate(
       { _id: req.params.thoughtId },
-      { $push: { reaction: reaction } },
+      { $push: { reactions: req.body } },
       { new: true }
     )
       .then((reaction) => {
@@ -82,15 +86,16 @@ module.exports = {
   },
   // Delete a thought reaction
   deleteReaction(req, res) {
-    Thought.findOneandUpdate(
+    Thought.findByIdAndUpdate(
       { _id: req.params.thoughtId },
-      { $pull: { reaction: req.params.reactionId } },
+      { $pull: { reactions: req.params.reactionId } },
       { new: true }
     )
       .then((reaction) => {
         if (!reaction) {
           res.status(404).json({ message: "No reaction with that ID" });
         } else {
+          console.log("Reaction deleted!");
           res.json(reaction);
         }
       })
